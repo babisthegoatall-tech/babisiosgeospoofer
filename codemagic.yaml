@@ -1,0 +1,18 @@
+workflows:
+  ios-enterprise:
+    name: Babis Hub - iOS Enterprise IPA
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      xcode: latest
+      ios_signing:
+        distribution_type: enterprise
+        bundle_identifier: com.example.babishub
+    scripts:
+      - name: Apply enterprise signing profile
+        script: xcode-project use-profiles
+      - name: Build signed IPA
+        script: xcode-project build-ipa --project "$CM_BUILD_DIR/BabisHub.xcodeproj" --scheme BabisHub
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log

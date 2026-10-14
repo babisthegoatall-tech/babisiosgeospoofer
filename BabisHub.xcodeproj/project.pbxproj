@@ -1,0 +1,176 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* BabisHubApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* BabisHubApp.swift */; };
+		A10000000000000000000002 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* Place.swift */; };
+		A10000000000000000000003 /* LocationSimulationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* LocationSimulationService.swift */; };
+		A10000000000000000000004 /* GPXDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* GPXDocument.swift */; };
+		A10000000000000000000005 /* HubViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* HubViewModel.swift */; };
+		A10000000000000000000006 /* MapKitPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* MapKitPicker.swift */; };
+		A10000000000000000000007 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* ContentView.swift */; };
+		A10000000000000000000008 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* LibraryView.swift */; };
+		A10000000000000000000009 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* SettingsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A20000000000000000000001 /* BabisHubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabisHubApp.swift; sourceTree = "<group>"; };
+		A20000000000000000000002 /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
+		A20000000000000000000003 /* LocationSimulationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSimulationService.swift; sourceTree = "<group>"; };
+		A20000000000000000000004 /* GPXDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPXDocument.swift; sourceTree = "<group>"; };
+		A20000000000000000000005 /* HubViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubViewModel.swift; sourceTree = "<group>"; };
+		A20000000000000000000006 /* MapKitPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapKitPicker.swift; sourceTree = "<group>"; };
+		A20000000000000000000007 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A20000000000000000000008 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		A20000000000000000000009 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A20000000000000000000010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A20000000000000000000011 /* BabisHub.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BabisHub.entitlements; sourceTree = "<group>"; };
+		A20000000000000000000012 /* BabisHub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabisHub.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A30000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A40000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A40000000000000000000002 /* BabisHub */,
+				A20000000000000000000012 /* BabisHub.app */,
+				A40000000000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A40000000000000000000002 /* BabisHub */ = {
+			isa = PBXGroup;
+			path = BabisHub;
+			sourceTree = "<group>";
+			children = (
+				A20000000000000000000001 /* BabisHubApp.swift */,
+				A40000000000000000000004 /* Models */,
+				A40000000000000000000005 /* Services */,
+				A40000000000000000000006 /* ViewModels */,
+				A40000000000000000000007 /* Views */,
+				A20000000000000000000010 /* Info.plist */,
+				A20000000000000000000011 /* BabisHub.entitlements */,
+			);
+		};
+		A40000000000000000000003 /* Products */ = {isa = PBXGroup; name = Products; sourceTree = "<group>"; children = (A20000000000000000000012 /* BabisHub.app */,); };
+		A40000000000000000000004 /* Models */ = {isa = PBXGroup; path = Models; sourceTree = "<group>"; children = (A20000000000000000000002 /* Place.swift */,); };
+		A40000000000000000000005 /* Services */ = {isa = PBXGroup; path = Services; sourceTree = "<group>"; children = (A20000000000000000000003 /* LocationSimulationService.swift */, A20000000000000000000004 /* GPXDocument.swift */,); };
+		A40000000000000000000006 /* ViewModels */ = {isa = PBXGroup; path = ViewModels; sourceTree = "<group>"; children = (A20000000000000000000005 /* HubViewModel.swift */,); };
+		A40000000000000000000007 /* Views */ = {isa = PBXGroup; path = Views; sourceTree = "<group>"; children = (A20000000000000000000006 /* MapKitPicker.swift */, A20000000000000000000007 /* ContentView.swift */, A20000000000000000000008 /* LibraryView.swift */, A20000000000000000000009 /* SettingsView.swift */,); };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A50000000000000000000001 /* BabisHub */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A90000000000000000000002 /* Build configuration list for PBXNativeTarget "BabisHub" */;
+			buildPhases = (A60000000000000000000001 /* Sources */, A30000000000000000000001 /* Frameworks */, A70000000000000000000001 /* Resources */,);
+			buildRules = ();
+			dependencies = ();
+			name = BabisHub;
+			productName = BabisHub;
+			productReference = A20000000000000000000012 /* BabisHub.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A80000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = { BuildIndependentTargetsInParallel = 1; LastUpgradeCheck = 1500; };
+			buildConfigurationList = A90000000000000000000001 /* Build configuration list for PBXProject "BabisHub" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base,);
+			mainGroup = A40000000000000000000001;
+			productRefGroup = A40000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (A50000000000000000000001 /* BabisHub */,);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A70000000000000000000001 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A60000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* BabisHubApp.swift in Sources */,
+				A10000000000000000000002 /* Place.swift in Sources */,
+				A10000000000000000000003 /* LocationSimulationService.swift in Sources */,
+				A10000000000000000000004 /* GPXDocument.swift in Sources */,
+				A10000000000000000000005 /* HubViewModel.swift in Sources */,
+				A10000000000000000000006 /* MapKitPicker.swift in Sources */,
+				A10000000000000000000007 /* ContentView.swift in Sources */,
+				A10000000000000000000008 /* LibraryView.swift in Sources */,
+				A10000000000000000000009 /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AB0000000000000000000001 /* Debug project config */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; IPHONEOS_DEPLOYMENT_TARGET = 15.0; SDKROOT = iphoneos; SWIFT_VERSION = 5.0; };
+			name = Debug;
+		};
+		AB0000000000000000000002 /* Release project config */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; IPHONEOS_DEPLOYMENT_TARGET = 15.0; SDKROOT = iphoneos; SWIFT_VERSION = 5.0; };
+			name = Release;
+		};
+		AB0000000000000000000003 /* Debug target config */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BabisHub/BabisHub.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BabisHub/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.babishub;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AB0000000000000000000004 /* Release target config */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = BabisHub/BabisHub.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BabisHub/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.babishub;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A90000000000000000000001 /* Build configuration list for PBXProject "BabisHub" */ = {isa = XCConfigurationList; buildConfigurations = (AB0000000000000000000001 /* Debug project config */, AB0000000000000000000002 /* Release project config */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A90000000000000000000002 /* Build configuration list for PBXNativeTarget "BabisHub" */ = {isa = XCConfigurationList; buildConfigurations = (AB0000000000000000000003 /* Debug target config */, AB0000000000000000000004 /* Release target config */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = A80000000000000000000001 /* Project object */;
+}
