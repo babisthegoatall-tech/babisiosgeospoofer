@@ -1,18 +1,33 @@
 workflows:
-  ios-enterprise:
-    name: Babis Hub - iOS Enterprise IPA
+  ios-unsigned:
+    name: Babis Hub - Unsigned iOS Build
     max_build_duration: 60
     instance_type: mac_mini_m2
     environment:
       xcode: latest
-      ios_signing:
-        distribution_type: enterprise
-        bundle_identifier: com.example.babishub
     scripts:
-      - name: Apply enterprise signing profile
-        script: xcode-project use-profiles
-      - name: Build signed IPA
-        script: xcode-project build-ipa --project "$CM_BUILD_DIR/BabisHub.xcodeproj" --scheme BabisHub
+      - name: Archive for iOS device without signing
+        script: |
+          set -e
+          xcodebuild \
+            -project "$CM_BUILD_DIR/BabisHub.xcodeproj" \
+            -scheme BabisHub \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$CM_BUILD_DIR/build/BabisHub.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            archive
+      - name: Package unsigned IPA artifact
+        script: |
+          set -e
+          APP_PATH="$CM_BUILD_DIR/build/BabisHub.xcarchive/Products/Applications/BabisHub.app"
+          test -d "$APP_PATH"
+          mkdir -p "$CM_BUILD_DIR/build/unsigned-ipa/Payload"
+          cp -R "$APP_PATH" "$CM_BUILD_DIR/build/unsigned-ipa/Payload/BabisHub.app"
+          cd "$CM_BUILD_DIR/build/unsigned-ipa"
+          /usr/bin/zip -qry "$CM_BUILD_DIR/build/BabisHub-unsigned.ipa" Payload
     artifacts:
-      - build/ios/ipa/*.ipa
+      - build/BabisHub-unsigned.ipa
       - /tmp/xcodebuild_logs/*.log
