@@ -14,6 +14,53 @@ protocol LocationSimulating: AnyObject {
 }
 
 @MainActor
+final class CurrentLocationProvider: NSObject, ObservableObject, CLLocationManagerDelegate {
+    @Published private(set) var location: CLLocation?
+    @Published private(set) var authorizationStatus: CLAuthorizationStatus
+    @Published private(set) var errorMessage: String?
+
+    private let manager: CLLocationManager
+
+    override init() {
+        manager = CLLocationManager()
+        authorizationStatus = manager.authorizationStatus
+        super.init()
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+    }
+
+    func requestLocationPermission() {
+        switch manager.authorizationStatus {
+        case .notDetermined:
+            manager.requestWhenInUseAuthorization()
+        case .authorizedAlways, .authorizedWhenInUse:
+            manager.requestLocation()
+        case .denied, .restricted:
+            errorMessage = "Location access is disabled. Allow it in Settings to show your current position."
+        @unknown default:
+            errorMessage = "This device's location authorization status is not supported."
+        }
+    }
+
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        authorizationStatus = manager.authorizationStatus
+        if authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse {
+            manager.requestLocation()
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let latest = locations.last, latest.horizontalAccuracy >= 0 else { return }
+        location = latest
+        errorMessage = nil
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        errorMessage = "Could not get your current location: \(error.localizedDescription)"
+    }
+}
+
+@MainActor
 final class LocationSimulationService: ObservableObject, LocationSimulating {
     @Published private(set) var coordinate = CLLocationCoordinate2D(latitude: 37.3349, longitude: -122.0090)
     @Published private(set) var isRunning = false

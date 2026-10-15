@@ -8,6 +8,7 @@ final class HubViewModel: ObservableObject {
     @Published var favorites: [Place] = []
     @Published var routes: [SavedRoute] = []
     @Published var selectedCoordinate = CLLocationCoordinate2D(latitude: 37.3349, longitude: -122.0090)
+    @Published var currentDeviceCoordinate: CLLocationCoordinate2D?
     @Published var latitudeInput = "37.3349"
     @Published var longitudeInput = "-122.0090"
     @Published var placeName = "Selected location"
@@ -17,6 +18,8 @@ final class HubViewModel: ObservableObject {
     @Published var mapFocusVersion = 0
     @Published var settings = HubSettings()
     @Published var errorMessage: String?
+    @Published private(set) var hasChosenDestination = false
+    @Published private(set) var hasSimulatedLocation = false
 
     let simulator: any LocationSimulating
 
@@ -25,6 +28,7 @@ final class HubViewModel: ObservableObject {
     private let decoder = JSONDecoder()
     private var activeSearch: MKLocalSearch?
     private var searchGeneration = 0
+    private var hasReceivedInitialLocation = false
 
     init(defaults: UserDefaults = .standard, simulator: any LocationSimulating) {
         self.defaults = defaults
@@ -41,14 +45,44 @@ final class HubViewModel: ObservableObject {
         routes.first(where: { $0.name == routeName })?.waypoints ?? []
     }
 
+    func updateCurrentDeviceLocation(_ coordinate: CLLocationCoordinate2D) {
+        guard coordinate.latitude.isFinite, coordinate.longitude.isFinite,
+              (-90...90).contains(coordinate.latitude), (-180...180).contains(coordinate.longitude) else { return }
+        currentDeviceCoordinate = coordinate
+        guard !hasChosenDestination, !simulator.isRunning else { return }
+        selectedCoordinate = coordinate
+        latitudeInput = String(format: "%.6f", locale: Locale(identifier: "en_US_POSIX"), coordinate.latitude)
+        longitudeInput = String(format: "%.6f", locale: Locale(identifier: "en_US_POSIX"), coordinate.longitude)
+        placeName = "Current location"
+        simulator.setCoordinate(coordinate)
+        if !hasReceivedInitialLocation {
+            mapFocusVersion += 1
+            hasReceivedInitialLocation = true
+        }
+    }
+
     func selectCoordinate(_ coordinate: CLLocationCoordinate2D, name: String? = nil) {
         guard coordinate.latitude.isFinite, coordinate.longitude.isFinite,
               (-90...90).contains(coordinate.latitude), (-180...180).contains(coordinate.longitude) else { return }
         selectedCoordinate = coordinate
+        hasChosenDestination = true
+        hasSimulatedLocation = false
         latitudeInput = String(format: "%.6f", locale: Locale(identifier: "en_US_POSIX"), coordinate.latitude)
         longitudeInput = String(format: "%.6f", locale: Locale(identifier: "en_US_POSIX"), coordinate.longitude)
         if let name { placeName = name }
-        simulator.setCoordinate(coordinate)
+    }
+
+    func goToDestination() {
+        guard hasChosenDestination,
+              selectedCoordinate.latitude.isFinite, selectedCoordinate.longitude.isFinite,
+              (-90...90).contains(selectedCoordinate.latitude),
+              (-180...180).contains(selectedCoordinate.longitude) else {
+            errorMessage = "Choose a destination on the map or enter coordinates before tapping Go."
+            return
+        }
+        simulator.setCoordinate(selectedCoordinate)
+        hasSimulatedLocation = true
+        mapFocusVersion += 1
     }
 
     func applyManualCoordinate() {
@@ -96,7 +130,10 @@ final class HubViewModel: ObservableObject {
         }
         if let firstWaypoint = routeToRun.waypoints.first {
             routeName = routeToRun.name
-            selectCoordinate(firstWaypoint.coordinate, name: firstWaypoint.name)
+            selectedCoordinate = firstWaypoint.coordinate
+            placeName = firstWaypoint.name
+            hasChosenDestination = true
+            hasSimulatedLocation = true
         }
         simulator.speedMetersPerSecond = min(max(simulator.speedMetersPerSecond, 0.5), 50)
         simulator.start(route: routeToRun.waypoints)

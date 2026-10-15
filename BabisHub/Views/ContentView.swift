@@ -1,13 +1,16 @@
 import CoreLocation
+import Combine
 import SwiftUI
+import UIKit
 
 struct ContentView: View {
     @ObservedObject var viewModel: HubViewModel
     @ObservedObject var simulator: LocationSimulationService
+    @ObservedObject var locationProvider: CurrentLocationProvider
 
     var body: some View {
         TabView {
-            MapScreen(viewModel: viewModel, simulator: simulator)
+            MapScreen(viewModel: viewModel, simulator: simulator, locationProvider: locationProvider)
                 .tabItem { Label("Map", systemImage: "map") }
             LibraryScreen(viewModel: viewModel)
                 .tabItem { Label("Library", systemImage: "bookmark") }
@@ -15,12 +18,15 @@ struct ContentView: View {
                 .tabItem { Label("Settings", systemImage: "gear") }
         }
         .alert("Babis Hub", isPresented: Binding(
-            get: { viewModel.errorMessage != nil },
-            set: { if !$0 { viewModel.errorMessage = nil } }
+            get: { viewModel.errorMessage != nil || locationProvider.errorMessage != nil },
+            set: { if !$0 { viewModel.errorMessage = nil; locationProvider.errorMessage = nil } }
         )) {
-            Button("OK", role: .cancel) { viewModel.errorMessage = nil }
+            Button("OK", role: .cancel) {
+                viewModel.errorMessage = nil
+                locationProvider.errorMessage = nil
+            }
         } message: {
-            Text(viewModel.errorMessage ?? "")
+            Text(viewModel.errorMessage ?? locationProvider.errorMessage ?? "")
         }
     }
 }
@@ -28,11 +34,39 @@ struct ContentView: View {
 private struct MapScreen: View {
     @ObservedObject var viewModel: HubViewModel
     @ObservedObject var simulator: LocationSimulationService
+    @ObservedObject var locationProvider: CurrentLocationProvider
     @State private var showingSearchResults = false
 
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Label("Your current position", systemImage: "location.fill")
+                        .font(.headline)
+                    if let coordinate = viewModel.currentDeviceCoordinate {
+                        Text(String(format: "%.5f, %.5f", coordinate.latitude, coordinate.longitude))
+                            .font(.caption.monospacedDigit())
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text("Allow location access to find you and center the map.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Button(
+                            locationProvider.authorizationStatus == .denied
+                                || locationProvider.authorizationStatus == .restricted
+                                ? "Open iOS Settings"
+                                : "Get my current position",
+                            action: requestLocation
+                        )
+                        .font(.caption)
+                    }
+                    Text("Where do you want to go? Tap a destination on the map, then tap Go.")
+                        .font(.subheadline)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+
                 HStack {
                     TextField("Search a place", text: $viewModel.searchText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -65,22 +99,36 @@ private struct MapScreen: View {
                 }
 
                 MapKitPicker(
-                    selectedCoordinate: simulator.isRunning ? simulator.coordinate : viewModel.selectedCoordinate,
+                    sourceCoordinate: viewModel.currentDeviceCoordinate,
+                    destinationCoordinate: viewModel.hasChosenDestination && !viewModel.hasSimulatedLocation
+                        ? viewModel.selectedCoordinate
+                        : nil,
+                    simulatedCoordinate: viewModel.hasSimulatedLocation || simulator.isRunning
+                        ? simulator.coordinate
+                        : nil,
                     focusVersion: viewModel.mapFocusVersion,
                     favorites: viewModel.favorites,
                     route: viewModel.routes.first(where: { $0.name == viewModel.routeName })?.waypoints ?? [],
                     onSelect: { viewModel.selectCoordinate($0) }
                 )
-                .frame(minHeight: 250)
+                .frame(minHeight: 220)
 
                 Form {
-                    Section(header: Text("Selected in-app location")) {
+                    Section(header: Text("Destination")) {
                         TextField("Location name", text: $viewModel.placeName)
                         HStack {
                             coordinateField("Latitude", text: $viewModel.latitudeInput)
                             coordinateField("Longitude", text: $viewModel.longitudeInput)
                         }
                         Button("Apply coordinates", action: viewModel.applyManualCoordinate)
+                        Button {
+                            viewModel.goToDestination()
+                        } label: {
+                            Label("Go to destination", systemImage: "location.north.fill")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(!viewModel.hasChosenDestination)
                         HStack {
                             Button("Save favorite", action: viewModel.addFavorite)
                             Spacer()
@@ -112,7 +160,7 @@ private struct MapScreen: View {
                     }
 
                     Section {
-                        Text("Babis Hub changes only the location shown inside this app. It cannot change iOS system GPS or another app's location.")
+                        Text("Go moves the simulated location only inside Babis Hub. It cannot change iOS system GPS or another app's location.")
                             .font(.footnote)
                             .foregroundColor(.secondary)
                     }
@@ -120,6 +168,10 @@ private struct MapScreen: View {
             }
             .navigationTitle("Babis Hub")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear { locationProvider.requestLocationPermission() }
+            .onReceive(locationProvider.$location.compactMap { $0 }) { location in
+                viewModel.updateCurrentDeviceLocation(location.coordinate)
+            }
         }
     }
 
@@ -133,6 +185,16 @@ private struct MapScreen: View {
         Task {
             await viewModel.searchPlaces()
             showingSearchResults = true
+        }
+    }
+
+    private func requestLocation() {
+        if locationProvider.authorizationStatus == .denied
+            || locationProvider.authorizationStatus == .restricted {
+            guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
+            UIApplication.shared.open(settingsURL)
+        } else {
+            locationProvider.requestLocationPermission()
         }
     }
 }

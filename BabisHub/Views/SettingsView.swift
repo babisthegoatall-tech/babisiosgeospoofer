@@ -28,7 +28,7 @@ struct SettingsScreen: View {
                     Text("Do not use this app to misrepresent real location to third-party services. Violating Apple Enterprise Program terms or Snapchat's Terms of Service may result in certificate revocation, account restrictions, or bans.")
                 }
                 Section(header: Text("Privacy")) {
-                    Text("Babis Hub does not request device location permission. Favorites, routes, and settings are stored locally using UserDefaults.")
+                    Text("When you allow While Using the App location access, Babis Hub reads your current position to center its map. This real position is never changed by Babis Hub. Favorites, routes, and settings are stored locally using UserDefaults.")
                 }
             }
             .navigationTitle("Settings")

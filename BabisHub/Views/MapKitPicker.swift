@@ -4,7 +4,9 @@ import SwiftUI
 import UIKit
 
 struct MapKitPicker: UIViewRepresentable {
-    var selectedCoordinate: CLLocationCoordinate2D
+    var sourceCoordinate: CLLocationCoordinate2D?
+    var destinationCoordinate: CLLocationCoordinate2D?
+    var simulatedCoordinate: CLLocationCoordinate2D?
     var focusVersion: Int
     var favorites: [Place]
     var route: [Place]
@@ -29,19 +31,19 @@ struct MapKitPicker: UIViewRepresentable {
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
         context.coordinator.onSelect = onSelect
-        if let selected = context.coordinator.selectedAnnotation {
-            selected.coordinate = selectedCoordinate
-        } else {
-            let selected = MKPointAnnotation()
-            selected.coordinate = selectedCoordinate
-            selected.title = "In-app simulated location"
-            context.coordinator.selectedAnnotation = selected
-            mapView.addAnnotation(selected)
-        }
+        context.coordinator.updateAnnotations(
+            source: sourceCoordinate,
+            destination: destinationCoordinate,
+            simulated: simulatedCoordinate,
+            mapView: mapView
+        )
 
         if context.coordinator.lastFavorites != favorites || context.coordinator.lastRoute != route {
             let staticAnnotations = mapView.annotations.filter {
-                !($0 is MKUserLocation) && $0 !== context.coordinator.selectedAnnotation
+                !($0 is MKUserLocation)
+                    && $0 !== context.coordinator.sourceAnnotation
+                    && $0 !== context.coordinator.destinationAnnotation
+                    && $0 !== context.coordinator.simulatedAnnotation
             }
             mapView.removeAnnotations(staticAnnotations)
             for favorite in favorites {
@@ -68,7 +70,8 @@ struct MapKitPicker: UIViewRepresentable {
         if !context.coordinator.hasSetInitialRegion || context.coordinator.lastFocusVersion != focusVersion {
             mapView.setRegion(
                 MKCoordinateRegion(
-                    center: selectedCoordinate,
+                    center: sourceCoordinate ?? destinationCoordinate ?? simulatedCoordinate
+                        ?? CLLocationCoordinate2D(latitude: 37.3349, longitude: -122.0090),
                     span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
                 ),
                 animated: false
@@ -81,7 +84,9 @@ struct MapKitPicker: UIViewRepresentable {
     final class Coordinator: NSObject, MKMapViewDelegate {
         weak var mapView: MKMapView?
         var onSelect: (CLLocationCoordinate2D) -> Void
-        var selectedAnnotation: MKPointAnnotation?
+        var sourceAnnotation: MKPointAnnotation?
+        var destinationAnnotation: MKPointAnnotation?
+        var simulatedAnnotation: MKPointAnnotation?
         var lastFavorites: [Place]?
         var lastRoute: [Place]?
         var hasSetInitialRegion = false
@@ -89,6 +94,41 @@ struct MapKitPicker: UIViewRepresentable {
 
         init(onSelect: @escaping (CLLocationCoordinate2D) -> Void) {
             self.onSelect = onSelect
+        }
+
+        func updateAnnotations(
+            source: CLLocationCoordinate2D?,
+            destination: CLLocationCoordinate2D?,
+            simulated: CLLocationCoordinate2D?,
+            mapView: MKMapView
+        ) {
+            updateAnnotation(&sourceAnnotation, coordinate: source, title: "Your current device position", mapView: mapView)
+            updateAnnotation(&destinationAnnotation, coordinate: destination, title: "Selected destination", mapView: mapView)
+            updateAnnotation(&simulatedAnnotation, coordinate: simulated, title: "Babis Hub simulated position", mapView: mapView)
+        }
+
+        private func updateAnnotation(
+            _ annotation: inout MKPointAnnotation?,
+            coordinate: CLLocationCoordinate2D?,
+            title: String,
+            mapView: MKMapView
+        ) {
+            guard let coordinate else {
+                if let annotation {
+                    mapView.removeAnnotation(annotation)
+                }
+                annotation = nil
+                return
+            }
+            if let annotation {
+                annotation.coordinate = coordinate
+            } else {
+                let newAnnotation = MKPointAnnotation()
+                newAnnotation.coordinate = coordinate
+                newAnnotation.title = title
+                annotation = newAnnotation
+                mapView.addAnnotation(newAnnotation)
+            }
         }
 
         @objc func handleTap(_ recognizer: UITapGestureRecognizer) {
@@ -111,6 +151,16 @@ struct MapKitPicker: UIViewRepresentable {
                 ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
             view.annotation = annotation
             view.canShowCallout = true
+            if annotation.title == "Your current device position" {
+                view.markerTintColor = .systemBlue
+                view.glyphImage = UIImage(systemName: "location.fill")
+            } else if annotation.title == "Selected destination" {
+                view.markerTintColor = .systemRed
+                view.glyphImage = UIImage(systemName: "mappin.and.ellipse")
+            } else if annotation.title == "Babis Hub simulated position" {
+                view.markerTintColor = .systemGreen
+                view.glyphImage = UIImage(systemName: "location.north.fill")
+            }
             return view
         }
     }

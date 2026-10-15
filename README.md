@@ -1,10 +1,10 @@
 # Babis Hub
 
-Babis Hub is an internal iOS 15+ QA and demo app built with SwiftUI, MapKit, and CoreLocation coordinate types. It supports in-app coordinate selection, place search, manual latitude/longitude entry, route playback, favorites, GPX import/export, and locally persisted settings.
+Babis Hub is an internal iOS 15+ QA and demo app built with SwiftUI, MapKit, and CoreLocation. It requests When In Use location access to show the device's current position, then lets the user tap a destination and press **Go** to move Babis Hub's simulated marker there. It also supports place search, manual latitude/longitude entry, route playback, favorites, GPX import/export, and locally persisted settings.
 
 ## Important limitation and permitted use
 
-Location simulation is app-local: Babis Hub updates only its own map and simulated coordinate. iOS sandboxing does not let this app change system-wide GPS or another app's location, including Snapchat. It uses no private APIs, jailbreak hooks, or sandbox bypasses. Use only for authorized testing and internal demonstrations. Misuse may violate Apple Enterprise Program terms or Snapchat's Terms of Service and can result in certificate revocation, account restrictions, or bans.
+Location simulation is app-local: Babis Hub reads the device's real current position (with permission) as a starting reference, but pressing **Go** moves only its own simulated map marker. It cannot teleport the phone's actual GPS position or change another app's location, including Snapchat. It uses no private APIs, jailbreak hooks, or sandbox bypasses. Use only for authorized testing and internal demonstrations. Misuse may violate Apple Enterprise Program terms or Snapchat's Terms of Service and can result in certificate revocation, account restrictions, or bans.
 
 ## Xcode project
 
@@ -27,9 +27,9 @@ BabisHub/
 
 Replace `com.example.babishub` with your organization's unique app identifier in `BabisHub.xcodeproj/project.pbxproj` before signing a device build. The Codemagic unsigned build does not require a provisioning profile or Apple Developer Enterprise membership.
 
-The entitlements file is intentionally empty: there is no special location-simulation entitlement and no location permission is requested. The app's search function uses Apple's MapKit services; a network connection may be required for search and map tiles.
+The entitlements file is intentionally empty: no special location-simulation entitlement is required. `Info.plist` includes the When In Use location usage explanation. The app's search function uses Apple's MapKit services; a network connection may be required for search and map tiles.
 
-The `LocationSimulating` protocol is injected into the MVVM view model. `LocationSimulationService` moves an app-owned coordinate along route waypoints; it does not call `CLLocationManager` or publish a device-wide/system location.
+The `LocationSimulating` protocol is injected into the MVVM view model. `CurrentLocationProvider` uses `CLLocationManager` to read the user's authorized real position. `LocationSimulationService` separately moves an app-owned coordinate to the selected destination or along route waypoints; it never publishes or changes a device-wide/system location.
 
 ## Build with Codemagic without Enterprise signing
 
