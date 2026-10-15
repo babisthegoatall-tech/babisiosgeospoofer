@@ -42,6 +42,10 @@ final class CurrentLocationProvider: NSObject, ObservableObject, CLLocationManag
         }
     }
 
+    func clearError() {
+        errorMessage = nil
+    }
+
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorizationStatus = manager.authorizationStatus
         if authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse {

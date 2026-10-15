@@ -19,11 +19,16 @@ struct ContentView: View {
         }
         .alert("Babis Hub", isPresented: Binding(
             get: { viewModel.errorMessage != nil || locationProvider.errorMessage != nil },
-            set: { if !$0 { viewModel.errorMessage = nil; locationProvider.errorMessage = nil } }
+            set: {
+                if !$0 {
+                    viewModel.errorMessage = nil
+                    locationProvider.clearError()
+                }
+            }
         )) {
             Button("OK", role: .cancel) {
                 viewModel.errorMessage = nil
-                locationProvider.errorMessage = nil
+                locationProvider.clearError()
             }
         } message: {
             Text(viewModel.errorMessage ?? locationProvider.errorMessage ?? "")
