@@ -1,6 +1,6 @@
 # Babis Hub
 
-Babis Hub is an internal iOS 15+ QA and demo app built with SwiftUI, MapKit, and CoreLocation. It requests When In Use location access to show the device's current position, then lets the user tap a destination and press **Go** to move Babis Hub's simulated marker there. It also supports place search, manual latitude/longitude entry, route playback, favorites, GPX import/export, and locally persisted settings.
+Babis Hub is an internal iOS 15+ QA and demo app built with SwiftUI, MapKit, and CoreLocation. It requests When In Use location access to show the device's current position, then lets the user tap a destination and press **Go** to move and center the map on Babis Hub's simulated marker there. Starting a saved route from **Plans** opens the map tab and follows the simulated route position. The real device position remains separately marked. It also supports place search, manual latitude/longitude entry, route playback, favorites, GPX import/export, and locally persisted settings.
 
 ## Important limitation and permitted use
 

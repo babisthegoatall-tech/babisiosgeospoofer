@@ -7,15 +7,24 @@ struct ContentView: View {
     @ObservedObject var viewModel: HubViewModel
     @ObservedObject var simulator: LocationSimulationService
     @ObservedObject var locationProvider: CurrentLocationProvider
+    @State private var selectedTab = 0
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             MapScreen(viewModel: viewModel, simulator: simulator, locationProvider: locationProvider)
                 .tabItem { Label("Map", systemImage: "map") }
-            LibraryScreen(viewModel: viewModel)
-                .tabItem { Label("Library", systemImage: "bookmark") }
+                .tag(0)
+            LibraryScreen(viewModel: viewModel, onStartSimulation: { route in
+                    viewModel.startSimulation(for: route)
+                    if simulator.isRunning {
+                        selectedTab = 0
+                    }
+                })
+                .tabItem { Label("Plans", systemImage: "bookmark") }
+                .tag(1)
             SettingsScreen(viewModel: viewModel)
                 .tabItem { Label("Settings", systemImage: "gear") }
+                .tag(2)
         }
         .alert("Babis Hub", isPresented: Binding(
             get: { viewModel.errorMessage != nil || locationProvider.errorMessage != nil },
@@ -64,6 +73,14 @@ private struct MapScreen: View {
                             action: requestLocation
                         )
                         .font(.caption)
+                    }
+                    if viewModel.hasSimulatedLocation || simulator.isRunning {
+                        Label("Simulated position in Babis Hub", systemImage: "location.north.fill")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(.green)
+                        Text(String(format: "%.5f, %.5f", simulator.coordinate.latitude, simulator.coordinate.longitude))
+                            .font(.caption.monospacedDigit())
+                            .foregroundColor(.secondary)
                     }
                     Text("Where do you want to go? Tap a destination on the map, then tap Go.")
                         .font(.subheadline)

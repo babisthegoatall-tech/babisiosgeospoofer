@@ -3,6 +3,7 @@ import UniformTypeIdentifiers
 
 struct LibraryScreen: View {
     @ObservedObject var viewModel: HubViewModel
+    var onStartSimulation: (SavedRoute) -> Void
     @State private var showingImporter = false
     @State private var routeToExport: SavedRoute?
     @State private var exportDocument: GPXDocument?
@@ -53,7 +54,7 @@ struct LibraryScreen: View {
                                 }
                             }
                             HStack {
-                                Button("Simulate") { viewModel.startSimulation(for: route) }
+                                Button("Simulate") { onStartSimulation(route) }
                                     .buttonStyle(.borderless)
                                 Button("Export GPX") { prepareExport(route) }
                                     .buttonStyle(.borderless)
@@ -71,7 +72,7 @@ struct LibraryScreen: View {
                     }
                 }
             }
-            .navigationTitle("Library")
+            .navigationTitle("Plans")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {

@@ -70,7 +70,7 @@ struct MapKitPicker: UIViewRepresentable {
         if !context.coordinator.hasSetInitialRegion || context.coordinator.lastFocusVersion != focusVersion {
             mapView.setRegion(
                 MKCoordinateRegion(
-                    center: sourceCoordinate ?? destinationCoordinate ?? simulatedCoordinate
+                    center: simulatedCoordinate ?? destinationCoordinate ?? sourceCoordinate
                         ?? CLLocationCoordinate2D(latitude: 37.3349, longitude: -122.0090),
                     span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
                 ),
